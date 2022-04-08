@@ -1,0 +1,16 @@
+---
+version: "3"
+services:
+  mc:
+    image: itzg/minecraft-server
+    container_name: minecraft-survival
+    ports:
+      - 42071:25565
+    environment:
+      EULA: "TRUE"
+      SEED: "387579004540251912"
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
