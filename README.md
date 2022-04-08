@@ -42,3 +42,12 @@ Obviously you need to replace the `PATH/TO/docker-compose.yml` with the actual p
 When playing with friends I like to be extra safe and back up the minecraft world save data to some other drive. We can do 
 this with the `run-backup.sh` script. This script will compress the `docker` folder in this repo to a `tar.gz` file and then 
 move that tar file to the given destination path. 
+
+## Access outside LAN
+
+If you want to play with friends then you will need to port forward the `42071` port (or whatever you changed it to in the `docker-compose.yml` file) on your router.
+
+Additionally, you will need some kind of dynamic DNS solution so that other people can get to your public facing IP address with ease. Personally I use
+[No-Ip](https://www.noip.com/members/dns/) to do this because it is free, easy, and simple to use. 
+
+Once you pick out a url from noip, then just have people join `foobar.hopto.org:42071` in Minecraft to play. 
