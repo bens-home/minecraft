@@ -49,8 +49,11 @@ I would recommend adding this as a `cron` job to make it easier.
 crontab -e
 ```
 
+Add the following line somewhere in there:
+
 ```
-0 4,16 * * * /path/to/run-backup.sh
+# Run the backup script at 4 AM and 4 PM (4, 16), putting the tar file in the given folder
+0 4,16 * * * /path/to/base/minecraft/run-backup.sh -o /path/to/archive/minecraft/base-mc
 ```
 
 ## Access outside LAN
