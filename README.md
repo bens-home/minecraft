@@ -43,6 +43,16 @@ When playing with friends I like to be extra safe and back up the minecraft worl
 this with the `run-backup.sh` script. This script will compress the `docker` folder in this repo to a `tar.gz` file and then 
 move that tar file to the given destination path. 
 
+I would recommend adding this as a `cron` job to make it easier.
+
+```
+crontab -e
+```
+
+```
+0 4,16 * * * /path/to/run-backup.sh
+```
+
 ## Access outside LAN
 
 If you want to play with friends then you will need to port forward the `42071` port (or whatever you changed it to in the `docker-compose.yml` file) on your router.
