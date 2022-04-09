@@ -1,39 +1,98 @@
 #!/bin/bash
 # Backup minecraft docker containers to somewhere else (preferably another drive!)
+# Don't judge my bash script skills here, I'm relatively new at this! 
 
-# TODO: Allow you to specify the paths via command line args, but fallback to these defaults
+# Print out the useage/help of this script
+function PrintHelp 
+{ 
+    echo ""
+    echo "Useage:   ./run-backup.sh [OPTIONS]"
+    echo ""
+    echo "Commands"
+    echo "  -h      Help                    Print this help message"
+    echo "  -f      Folder to Tar           Specifiy the folder that should be tar'd"
+    echo "  -o      Output folder           Specify where the tar file should be put"
+    echo "  -c      Compose file            Override which docker-compose.yml file to use"
+    exit 1;
+}
 
 # The path of the directory that we want to tar and compress
 folderToTar=./docker
 
 # The path of the directory that the backup will be placed in
-outputDir=/media/BigData/Vault/minecraft/mc-1.18.1-survival
+outputDir=/media/BigData/Vault/minecraft/test
 
-# TODO: Allow you to specify the out file name with command line args
-outFilePrefix=mc-backup
+# Iterate the optional args!
+while getopts ":f:o:c:" flag;
+do
+    case "${flag}" in
+        f) folderToTar=${OPTARG};;
+        o) outputDir=${OPTARG};;
+        c) composeFileOverride=${OPTARG};;
+        *) 
+            PrintHelp
+            ;;
+    esac
+done
+
+# By default, assume the compose file is in the folder to tar at the top level
+composeFileDefault=$folderToTar/docker-compose.yml
+
+if test -z "$composeFileOverride" 
+then
+      composeFile=$composeFileDefault
+else
+      composeFile=$composeFileOverride
+fi
 
 # Generate a unique file name based on the current date and time
 dateFormat=$(date '+%F-%Hh-%Mm')
-outFileName="$outFilePrefix-$dateFormat.tar.gz"
+outFileName="mc-backup-$dateFormat.tar.gz"
 
-# Assume that the docker-compose file is
-composeFile=$folderToTar/docker-compose.yml
+echo "======================================"
+echo "  Folder To Tar:        $folderToTar"
+echo "  Output directory:     $outputDir"
+echo "  Out file name:        $outFileName"
+echo "  Docker Compose File:  $composeFile"
+echo "======================================"
 
-# Echo some useful info
-echo "Docker Compose file path: $composeFile"
-echo "Tar file name: $outFileName"
-
-# TODO: Add some messaging on the server about this so players know
+# # TODO: Add some messaging on the server about this so players know
 
 # Tell the minecraft world to save all so that the files in the 
+echo ""
 echo "RCON Save command to the MC server!"
 docker-compose -f $composeFile exec mc rcon-cli save-all
 
+result="$?"
+
+if [ $? -eq 0 ]; then
+   echo "Successfully saved the minecraft world!"
+else
+   echo "Failed to save minecraft world, is it running? Error code $?"
+fi
+
+echo ""
 # Tar the folder that we want to the given file name we want
 echo "Starting Tar..."
 tar -zcf $outFileName $folderToTar
-echo "Tar Complete!"
+
+result="$?"
+
+if [ $? -eq 0 ]; then
+    echo "Tar Complete!"
+else
+   echo "Uh oh! Failed to tar the folder '$folderToTar': Error code $?"
+fi
 
 # Move this tar file to the output directory that we want
 mv $outFileName $outputDir
-echo "Moved tar to output dir!"
+
+result="$?"
+
+if [ $? -eq 0 ]; then
+    echo "======================================"
+    echo "Hoozah! Minecraft was succesfully backed up to: "
+    echo "      $outputDir/$outFileName"
+else
+   echo "Uh oh! Failed to move the file: Error code $?"
+fi
