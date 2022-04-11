@@ -56,6 +56,15 @@ Add the following line somewhere in there:
 0 4,16 * * * /path/to/base/minecraft/run-backup.sh -o /path/to/archive/minecraft/base-mc
 ```
 
+## Access the server via LAN
+
+To play on LAN you need to allow `42071` through the ubuntu firewall. One example using `ufw` is:
+
+```
+sudo ufw allow 42071 comment "For minecraft server"
+sudo ufw reload
+```
+
 ## Access outside LAN
 
 If you want to play with friends then you will need to port forward the `42071` port (or whatever you changed it to in the `docker-compose.yml` file) on your router.
