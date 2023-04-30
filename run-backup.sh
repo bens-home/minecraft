@@ -20,7 +20,7 @@ function PrintHelp
 folderToTar=./docker
 
 # The path of the directory that the backup will be placed in
-outputDir=/media/BigData/Vault/minecraft/test
+outputDir=./mc-backup
 
 # Iterate the optional args!
 while getopts ":f:o:c:" flag;
@@ -49,10 +49,13 @@ fi
 dateFormat=$(date '+%F-%Hh-%Mm')
 outFileName="mc-backup-$dateFormat.tar.gz"
 
+outFilePath="$outputDir/$outFileName"
+
 echo "======================================"
 echo "  Folder To Tar:        $folderToTar"
 echo "  Output directory:     $outputDir"
 echo "  Out file name:        $outFileName"
+echo "  Out File Path:        $outFilePath"
 echo "  Docker Compose File:  $composeFile"
 echo "======================================"
 
@@ -71,10 +74,13 @@ else
    echo "Failed to save minecraft world, is it running? Error code $?"
 fi
 
+echo "Creating output director '$outputDir'"
+mkdir -p $outputDir
+
 echo ""
 # Tar the folder that we want to the given file name we want
 echo "Starting Tar..."
-tar -zcf $outFileName $folderToTar
+tar -czf $outFilePath $folderToTar
 
 result="$?"
 
@@ -84,15 +90,13 @@ else
    echo "Uh oh! Failed to tar the folder '$folderToTar': Error code $?"
 fi
 
-# Move this tar file to the output directory that we want
-mv $outFileName $outputDir
-
 result="$?"
 
 if [ $? -eq 0 ]; then
     echo "======================================"
     echo "Hoozah! Minecraft was succesfully backed up to: "
     echo "      $outputDir/$outFileName"
+    echo "To restore the data, unzip the archive with 'tar -xzvf $outFileName' and copy its contents to replace the 'docker' folder."
 else
    echo "Uh oh! Failed to move the file: Error code $?"
 fi
